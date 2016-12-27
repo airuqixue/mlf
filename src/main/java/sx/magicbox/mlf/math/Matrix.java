@@ -192,7 +192,7 @@ public class Matrix implements Serializable {
 
     public double get(int i,int j){
         if((i<row && j<column)
-                && (i>0&& j>0)){
+                && (i>=0&& j>=0)){
             return this.data[i][j];
         }else{
             throw new RuntimeException(String.format("index (%s,%s) out of boundary ",i,j));
