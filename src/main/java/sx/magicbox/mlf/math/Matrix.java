@@ -1,6 +1,7 @@
 package sx.magicbox.mlf.math;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 /**
  * Created by yinsx on 2016/09/06.
@@ -24,6 +25,7 @@ public class Matrix implements Serializable {
             }
         }
     }
+
 
     public Matrix(double data[][]){
         this(data.length,data[0].length);
@@ -62,7 +64,8 @@ public class Matrix implements Serializable {
         Matrix newMatrix = new Matrix(row,column);
         for(int i=0;i<row;i++){
             for(int j = 0; j<column;j++){
-                newMatrix.data[i][j] = this.data[i][j] - m.data[i][j];
+                //newMatrix.data[i][j] = this.data[i][j] - m.data[i][j];
+                newMatrix.set(i,j,this.data[i][j] - m.data[i][j]);
             }
         }
         return newMatrix;
@@ -96,8 +99,7 @@ public class Matrix implements Serializable {
     public Matrix divide(Matrix m){
         return new Matrix(2,2);
     }
-
-    public Matrix divideBy(double value){
+    public Matrix divide(double value) {
         Matrix newMatrix = new Matrix(this.row,this.column);
         for(int i = 0 ; i<row;i++){
             for(int j = 0 ; j < column ;j++){
@@ -106,19 +108,35 @@ public class Matrix implements Serializable {
         }
         return newMatrix;
     }
+    public Matrix divideBy(double value){
+        Matrix newMatrix = new Matrix(this.row,this.column);
+        for(int i = 0 ; i<row;i++){
+            for(int j = 0 ; j < column ;j++){
+                newMatrix.set(i,j,data[i][j]/(value));
+            }
+        }
+        return newMatrix;
+    }
 
     public Matrix add(double a){
-        return new Matrix(2,2);
+
+        Matrix newMatrix = new Matrix(this.row,this.column);
+        for(int i = 0 ; i<row;i++){
+            for(int j = 0 ; j < column ;j++){
+                newMatrix.set(i,j,data[i][j]+a);
+            }
+        }
+        return newMatrix;
     }
 
     public Matrix subtract(double a){
-        return new Matrix(2,2);
+       return add(-1*a);
     }
 
     public Matrix subtractBy(double a){
         Matrix newMatrix = new Matrix(this.row,this.column);
-        for(int i = 0 ; i<row;i++){
-            for(int j = 0 ; j < column ;j++){
+        for(int i = 0 ; i<this.row;i++){
+            for(int j = 0 ; j < this.column ;j++){
                 newMatrix.set(i,j,a-data[i][j]);
             }
         }
@@ -189,6 +207,30 @@ public class Matrix implements Serializable {
         return result;
     }
 
+    public static Matrix addBias(Matrix result) {
+        Matrix withBias = new Matrix(result.getRow(), result.getColumn() + 1);
+        for (int h = 0; h < result.getRow(); h++) {
+            withBias.set(h, 0, 1d);
+        }
+        for (int r = 0; r < result.getRow(); r++) {
+            for (int c = 0; c < result.getColumn(); c++) {
+                withBias.set(r, c + 1, result.get(r, c));
+            }
+        }
+        return withBias;
+    }
+
+    public static Matrix subBias(Matrix result) {
+        Matrix withoutBias = new Matrix(result.getRow(), result.getColumn() - 1);
+
+        for (int r = 0; r < result.getRow(); r++) {
+            for (int c = 1; c < result.getColumn(); c++) {
+                withoutBias.set(r, c - 1, result.get(r, c));
+            }
+        }
+        return withoutBias;
+    }
+
 
     public double get(int i,int j){
         if((i<row && j<column)
@@ -223,6 +265,34 @@ public class Matrix implements Serializable {
         return result;
     }
 
+    public static Matrix copy(Matrix m){
+       Matrix newm = new Matrix(m.getRow(), m.getColumn());
+       for(int i = 0; i < m.getRow();i++){
+           System.arraycopy(m.data[i],0,newm.data[i],0,m.data[i].length);
+       }
+       return newm;
+    }
+
+    public static Matrix setColumn(Matrix m, int column, double value){
+       if(column >= m.getColumn()){
+           throw new RuntimeException(String.format("column %s is bigger than  %s",column, m.getColumn()));
+       }
+       for(int i = 0; i < m.getRow(); i++){
+           m.set(i,column,value);
+       }
+       return m;
+    }
+
+    public static Matrix setRow(Matrix m, int row, double value){
+        if(row >= m.getRow()){
+            throw new RuntimeException(String.format("row %s is bigger than  %s",row, m.getRow()));
+        }
+        for(int i = 0; i < m.column; i++){
+            m.set(row,i,value);
+        }
+        return m;
+    }
+
     public Matrix log(){
         Matrix result = new Matrix(getRow(),getColumn());
         for(int i = 0 ; i < getRow(); i++){
@@ -245,6 +315,22 @@ public class Matrix implements Serializable {
         return buffer.toString();
     }
 
+    public double[][] getData(){
+       return this.data;
+    }
+
+    public String tostr(){
+       StringBuffer bf = new StringBuffer();
+       DecimalFormat df = new DecimalFormat("#.####");
+       for(int i = 0;i<this.getRow();i++){
+           for(int j = 0; j<this.getColumn();j++){
+               double d = this.get(i,j);
+               bf.append(df.format(d)+"    ");
+           }
+           bf.append("\n");
+       }
+       return bf.toString();
+    }
 
 
 

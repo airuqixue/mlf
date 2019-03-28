@@ -28,7 +28,7 @@ public class Trainer {
 
     CostFunction costFunction = new LinearRegressionCostFunction(hypothesis);
 
-    GradientDescent gradientDescent = new GradientDescent();
+    GradientDescent gradientDescent = new GradientDescent(hypothesis);
 
     int step = 300;
 
@@ -82,7 +82,7 @@ public class Trainer {
         };
         Matrix X = new Matrix(data);
         Matrix Y = new Matrix(ty);
-        GradientDescent gradientDescent = new GradientDescent();
+        GradientDescent gradientDescent = new GradientDescent(new LinearHypothesis());
         Matrix theta = gradientDescent.randomTheta(2,1);
         //theta.set(0,0,0);
         Trainer trainer = new Trainer(X,Y,theta);
@@ -90,5 +90,7 @@ public class Trainer {
         double preData[][] = {{1,1200}};
         Matrix predict  = trainer.predict(new Matrix(preData));
         System.out.println(predict);
+
+
     }
 }
